@@ -4,6 +4,7 @@
     {
         public string Name { get; set; }
         public string Description { get; set; }
+        public string ContactEmail { get; set; }
         public int Id { get; set; }
         static private int nextid = 1;
         public Event()
@@ -11,10 +12,11 @@
             Id = nextid;
             nextid++;
         }
-        public Event(string name, string description) :this()
+        public Event(string name, string description, string contactEmail) : this()
         {
             Name = name;
             Description = description;
+            ContactEmail = contactEmail;
         }
         public override string ToString()
         {

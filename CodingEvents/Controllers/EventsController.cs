@@ -1,30 +1,79 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using CodingEvents.Models;
+using CodingEvents.Data;
+using CodingEvents.ViewModels;
 
 namespace CodingEvents.Controllers
 {
     public class EventsController : Controller
     {
-        static private Dictionary<string, string> Events = new Dictionary<string, string>();
         // GET: /<controller>/
         [HttpGet]
         public IActionResult Index()
         {
-            ViewBag.events = Events;
+            List<Event> events = new List<Event>(EventData.GetAll());
 
-            return View();
+            return View(events);
         }
+
         // GET: /<controller>/add
-        [HttpGet]
         public IActionResult Add()
         {
+            AddEventViewModel addEventViewModel = new AddEventViewModel();
+
+            return View(addEventViewModel);
+        }
+
+        //POST : /<controller>/add
+        [HttpPost]
+        public IActionResult Add(AddEventViewModel addEventViewModel)
+        {
+            Event newEvent = new Event
+            {
+                Name = addEventViewModel.Name,
+                Description = addEventViewModel.Description
+            };
+            EventData.Add(newEvent);
+
+            return Redirect("/events");
+        }
+
+        // GET: /<controller>/delete
+        public IActionResult Delete()
+        {
+            ViewBag.events = EventData.GetAll();
             return View();
         }
 
-        [HttpPost("/events/add")]
-        public IActionResult NewEvent(string name, string description)
+        // POST: /<controller>/delete
+        [HttpPost]
+        public IActionResult Delete(int[] eventIds)
         {
-            Events.Add(name, description);
+            foreach(int eventId in eventIds)
+            {
+                EventData.Remove(eventId);
+            }
+            return Redirect("/events");
+        }
 
+        //GET : /<controller>/edit
+        [HttpGet]
+        [Route("/events/edit/{eventId}")]
+        public IActionResult Edit(int eventId)
+        {
+            ViewBag.Event = EventData.GetById(eventId);
+            ViewBag.title = $"Edit Event {ViewBag.Event.Name}(id={ViewBag.Event.Id})";
+            return View();
+        }
+
+        // POST: /<controller>/edit
+        [HttpPost("/events/edit")]
+        [Route("/events/edit/{eventId}")]
+        public IActionResult SubmitEditEventForm(int eventId, string name, string description)
+        {
+            Event eventToBeEdited = EventData.GetById(eventId);
+            eventToBeEdited.Name = name;
+            eventToBeEdited.Description = description;
             return Redirect("/events");
         }
     }

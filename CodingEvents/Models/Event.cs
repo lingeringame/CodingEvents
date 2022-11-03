@@ -5,6 +5,7 @@
         public string Name { get; set; }
         public string Description { get; set; }
         public string ContactEmail { get; set; }
+        public EventType Type { get; set; }
         public int Id { get; set; }
         static private int nextid = 1;
         public Event()

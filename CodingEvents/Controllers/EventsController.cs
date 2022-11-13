@@ -2,16 +2,24 @@
 using CodingEvents.Models;
 using CodingEvents.Data;
 using CodingEvents.ViewModels;
+using Microsoft.AspNetCore.CookiePolicy;
+using System.Linq;
 
 namespace CodingEvents.Controllers
 {
     public class EventsController : Controller
     {
+        private EventDbContext context;
+
+        public EventsController(EventDbContext dbContext)
+        {
+            this.context = dbContext;
+        }
         // GET: /<controller>/
         [HttpGet]
         public IActionResult Index()
         {
-            List<Event> events = new List<Event>(EventData.GetAll());
+            List<Event> events = context.Events.ToList();
 
             return View(events);
         }
@@ -37,7 +45,8 @@ namespace CodingEvents.Controllers
                     ContactEmail = addEventViewModel.ContactEmail,
                     Type = addEventViewModel.Type
                 };
-                EventData.Add(newEvent);
+                context.Events.Add(newEvent);
+                context.SaveChanges();
 
                 return Redirect("/events");
             }
@@ -47,7 +56,7 @@ namespace CodingEvents.Controllers
         // GET: /<controller>/delete
         public IActionResult Delete()
         {
-            ViewBag.events = EventData.GetAll();
+            ViewBag.events = context.Events.ToList();
             return View();
         }
 
@@ -57,8 +66,10 @@ namespace CodingEvents.Controllers
         {
             foreach(int eventId in eventIds)
             {
-                EventData.Remove(eventId);
+                Event theEvent = context.Events.Find(eventId);
+                context.Events.Remove(theEvent);
             }
+            context.SaveChanges();
             return Redirect("/events");
         }
 
@@ -67,7 +78,8 @@ namespace CodingEvents.Controllers
         [Route("/events/edit/{eventId}")]
         public IActionResult Edit(int eventId)
         {
-            ViewBag.Event = EventData.GetById(eventId);
+            ViewBag.Event = context.Events.Find(eventId);
+            //ViewBag.Event = EventData.GetById(eventId);
             ViewBag.title = $"Edit Event {ViewBag.Event.Name}(id={ViewBag.Event.Id})";
             return View();
         }
@@ -77,9 +89,10 @@ namespace CodingEvents.Controllers
         [Route("/events/edit/{eventId}")]
         public IActionResult SubmitEditEventForm(int eventId, string name, string description)
         {
-            Event eventToBeEdited = EventData.GetById(eventId);
+            Event eventToBeEdited = context.Events.Find(eventId);
             eventToBeEdited.Name = name;
             eventToBeEdited.Description = description;
+            context.SaveChanges();
             return Redirect("/events");
         }
     }

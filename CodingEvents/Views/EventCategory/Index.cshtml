@@ -1,0 +1,19 @@
+﻿@model List<EventCategory>
+
+
+<h1>@ViewBag.title</h1>
+
+<table class="table">
+    <tr>
+        <th>Id</th>
+        <th>Name</th>
+    </tr>
+    @foreach(EventCategory category in Model)
+    {
+        <tr>
+            <td>@category.Id</td>
+            <td>@category.Name</td>
+        </tr>
+    }
+</table>
+

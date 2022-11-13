@@ -7,13 +7,10 @@
         public string ContactEmail { get; set; }
         public EventType Type { get; set; }
         public int Id { get; set; }
-        static private int nextid = 1;
         public Event()
         {
-            Id = nextid;
-            nextid++;
         }
-        public Event(string name, string description, string contactEmail) : this()
+        public Event(string name, string description, string contactEmail)
         {
             Name = name;
             Description = description;
